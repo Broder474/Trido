@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libs\Lua\include;C:\libs\glfw-3.3.8\include;C:\libs\freeglut-3.6.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libs\Lua\include;C:\libs\glfw-3.3.8\include;C:\libs\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -110,7 +110,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\libs\glfw-3.3.8\lib\Debug;C:\Libs\Lua;C:\libs\freeglut-3.6.0\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\libs\glfw-3.3.8\lib\Debug;C:\Libs\Lua;C:\libs\freeglut\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>liblua54.a;glfw3.lib;freeglutd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
