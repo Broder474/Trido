@@ -16,6 +16,9 @@
     <Filter Include="Broder">
       <UniqueIdentifier>{bbb9b1c6-fcb8-4456-a5c5-09623d5c40fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{9d418a28-caf1-4ae7-94de-1356b17b537c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Trido.cpp">
@@ -42,6 +45,9 @@
     <ClCompile Include="EventManager.cpp">
       <Filter>Broder</Filter>
     </ClCompile>
+    <ClCompile Include="Resources.cpp">
+      <Filter>Broder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IO.h">
@@ -65,5 +71,16 @@
     <ClInclude Include="EventManager.h">
       <Filter>Broder</Filter>
     </ClInclude>
+    <ClInclude Include="Resources.h">
+      <Filter>Broder</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="frag1.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="vert1.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -3,13 +3,13 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Core
+namespace UI
 {
-	TEST_CLASS(ClassCore)
+	TEST_CLASS(ClassGUI_Element)
 	{
 	public:
-		
-		TEST_METHOD(Core)
+
+		TEST_METHOD(IsInBounds)
 		{
 		}
 	};

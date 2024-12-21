@@ -1,16 +1,17 @@
 #pragma once
 
+#include "UI.h"
 #include <string>
-#include <GLFW/glfw3.h>
 #include <GL/freeglut.h>
+#include <rapidxml.hpp>
+#include <lua.hpp>
+#include <functional>
+#include <vector>
 
-// internal headers
 #include "IO.h"
 #include "StateManager.h"
 #include "EventManager.h"
 #include "CmdManager.h"
-#include "UI.h"
-#include "Logger.h"
 
 using namespace IO;
 using namespace StateManager;
@@ -20,16 +21,13 @@ using namespace UI;
 
 namespace Core
 {
+
 	class Settings
 	{
 	public:
 		float monitory_scaleX = 0;
 		float monitory_scaleY = 0;
 		const GLFWvidmode* video_mode;
-	};
-	class Resources
-	{
-
 	};
 	class System
 	{
@@ -44,13 +42,19 @@ namespace Core
 		Core();
 		void Loop();
 		void Pipeline();
+		void Render();
+		void Exit();
 		std::string getVersion() { return version; }
 
 		Logger logger;
-		GLFWwindow* window = nullptr;
+		GLFWwindow* gl_window = nullptr;
 		Settings settings;
-		Resources resources;
+		Resources res;
 		System sysdata;
+		std::vector<std::shared_ptr<Window>> windows;
+		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod);
+		static void MouseCallback(GLFWwindow* window, int button, int action, int mod);
+		static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 		
 	private:
 		std::string version = "0.0.1pa";
