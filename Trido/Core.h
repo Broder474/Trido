@@ -13,7 +13,7 @@
 #include "EventManager.h"
 #include "CmdManager.h"
 
-using namespace IO;
+using namespace Input_Output;
 using namespace StateManager;
 using namespace EventManager;
 using namespace CmdManager;
@@ -27,13 +27,6 @@ namespace Core
 	public:
 		float monitory_scaleX = 0;
 		float monitory_scaleY = 0;
-		const GLFWvidmode* video_mode;
-	};
-	class System
-	{
-	public:
-		float monitor_scaleX = 0;
-		float monitor_scaleY = 0;
 		const GLFWvidmode* video_mode;
 	};
 	class Core
@@ -50,12 +43,11 @@ namespace Core
 		GLFWwindow* gl_window = nullptr;
 		Settings settings;
 		Resources res;
-		System sysdata;
+		IO io;
 		std::vector<std::shared_ptr<Window>> windows;
 		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod);
 		static void MouseCallback(GLFWwindow* window, int button, int action, int mod);
 		static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-		
 	private:
 		std::string version = "0.0.1pa";
 	};

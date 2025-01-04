@@ -1,4 +1,4 @@
-#include "Resources.h"
+п»ї#include "Resources.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -12,7 +12,7 @@ unsigned int Resources::compileShader(unsigned int type, const char* source) {
 	glShaderSource(shader, 1, &source, nullptr);
 	glCompileShader(shader);
 
-	// Проверка на ошибки
+	// Error check
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -23,19 +23,18 @@ unsigned int Resources::compileShader(unsigned int type, const char* source) {
 	return shader;
 }
 
-// Функция для создания программы
 unsigned int Resources::createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource) {
-	// Компиляция шейдеров
+	// compiling shaders
 	unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
 	unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
-	// Создание шейдерной программы
+	// creating shader program
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vertexShader);
 	glAttachShader(program, fragmentShader);
 	glLinkProgram(program);
 
-	// Проверка на ошибки линковки
+	// linking check
 	int success;
 	char infoLog[512];
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
@@ -44,7 +43,7 @@ unsigned int Resources::createShaderProgram(const char* vertexShaderSource, cons
 		logger->print(Log_type::LOG_ERROR, infoLog);
 	}
 
-	// Удаляем шейдеры после линковки
+	// delete shaders after linking
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
@@ -53,14 +52,14 @@ unsigned int Resources::createShaderProgram(const char* vertexShaderSource, cons
 void Resources::Load()
 {
 	int textures_count = 1;
-	textures.reserve(textures_count);
+	textures;
 	for (int i = 0; i < textures_count; i++)
 	{
 		// handling xml data
 	}
 	Resources::Texture tex1;
 	if (LoadTextureFromFile("textures/tex1.png", &tex1))
-		textures.push_back(tex1);
+		textures.insert({ "tex1", tex1 });
 }
 bool Resources::LoadTextureFromFile(const char* filename, Texture* texture)
 {

@@ -8,14 +8,12 @@ namespace Core
 		glewExperimental = GL_TRUE;
 
 		GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
-		glfwGetMonitorContentScale(primary_monitor, &sysdata.monitor_scaleX, &sysdata.monitor_scaleY);
-		settings.monitory_scaleX = sysdata.monitor_scaleX;
-		settings.monitory_scaleY = sysdata.monitor_scaleY;
+		glfwGetMonitorContentScale(primary_monitor, &settings.monitory_scaleX, &settings.monitory_scaleY);
 
-		sysdata.video_mode = glfwGetVideoMode(primary_monitor);
-		settings.video_mode = sysdata.video_mode;
+		settings.video_mode = glfwGetVideoMode(primary_monitor);
 
 		gl_window = glfwCreateWindow(settings.video_mode->width, settings.video_mode->height, "Trido", NULL, NULL);
+		io.init(gl_window);
 		glfwMakeContextCurrent(gl_window);
 		glewInit();
 		glfwSwapInterval(1);
@@ -23,6 +21,7 @@ namespace Core
 		glfwSetWindowUserPointer(gl_window, this);
 		glfwSetKeyCallback(gl_window, Core::KeyCallback);
 		glfwSetMouseButtonCallback(gl_window, Core::MouseCallback);
+		glfwSetCursorPosCallback(gl_window, Core::CursorPosCallback);
 
 		res.Load();
 		windows.push_back(std::make_shared<MainWindow>(gl_window, &res));
@@ -53,7 +52,10 @@ namespace Core
 			std::vector<std::shared_ptr<Window>>& windows = core->windows;
 			for (auto& window : windows)
 			{
-				window->OnMouseClick(button, action, mod);
+				std::vector<std::shared_ptr<UI::Window::GUI_Element>>& gui_elements = window->gui_elements;
+				for (auto& gui_element : gui_elements)
+					gui_element->MouseEvent(button, action, mod);
+				window->MouseEvent(button, action, mod);
 				if (window->LockInput == Window::ALLOW_ALL || window->LockInput == Window::ALLOW_MOUSE)
 					continue;
 				// stop accept input from lower windows
@@ -63,7 +65,8 @@ namespace Core
 	}
 	void Core::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 	{
-
+		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
+		core->io.UpdateCursorPos(xpos, ypos);
 	}
 	void Core::Loop()
 	{

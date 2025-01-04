@@ -1,28 +1,35 @@
 #include "UI.h"
 namespace UI
 {
+	using GUI_Element = Window::GUI_Element;
+
+	// Window basic class
 	Window::Window(GLFWwindow* window, Resources* resources): window(window), res(resources) {
 		
 	}
-	GUI_Element::GUI_Element(glm::vec2 point1, glm::vec2 point2) {
+
+	// GUI element basic class
+	GUI_Element::GUI_Element(glm::vec2 point1, glm::vec2 point2): point1(point1), point2(point2)
+	{
+
 	}
 	bool GUI_Element::IsInBounds(glm::vec2)
 	{
 		// надо проверить какие координаты при клике, чтобы понимать откуда считать координаты, а потом писать логику
 		return true;
 	}
-	template<class Object, class Method>
-	void GUI_Element::SetOnMouseHoverCallback(Object* OnMouseHoverObj, Method OnMouseHoverMethod) {
-		OnMouseHover = std::bind(OnMouseHoverMethod, OnMouseHoverObj);
+
+	Color_Button::Color_Button(glm::vec2 point1, glm::vec2 point2): GUI_Element(point1, point2)
+	{
+
 	}
-	template<class Object, class Method>
-	void GUI_Element::SetLeftMouseButtonPressed(Object* LeftMouseButtonPressedObj, Method LeftMouseButtonPressedMethod) {
-		LeftMouseButtonPressed = std::bind(LeftMouseButtonPressedMethod, LeftMouseButtonPressedObj);
+
+	void Color_Button::MouseEvent(int button, int action, int mod)
+	{
+		
 	}
-	template<class Object, class Method>
-	void GUI_Element::SetRightMouseButtonPressed(Object* RightMouseButtonPressedObj, Method RightMouseButtonPressedMethod) {
-		RightMouseButtonPressed = std::bind(RightMouseButtonPressedMethod, RightMouseButtonPressedObj);
-	}
+
+
 	MainWindow::MainWindow(GLFWwindow* window, Resources* resources) : Window(window, resources)
 	{
 		glGenVertexArrays(1, &VAO);
@@ -74,6 +81,8 @@ namespace UI
         }
     )";
 		shaderProgram = res->createShaderProgram(vertexShaderSource, fragmentShaderSource);
+
+		gui_elements.push_back(std::make_shared<Color_Button>(Color_Button({ 0, 0 }, { 1920, 1080 })));
 	}
 	void MainWindow::Render() 
 	{
@@ -81,7 +90,7 @@ namespace UI
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-		glBindTexture(GL_TEXTURE_2D, res->textures[0].tex_id);
+		glBindTexture(GL_TEXTURE_2D, res->textures["tex1"].tex_id);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
@@ -90,11 +99,7 @@ namespace UI
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 			glfwSetWindowShouldClose(window, true);
 	}
-	void MainWindow::OnMouseClick(int button, int action, int mod)
-	{
-
-	}
-	void MainWindow::OnCursorPos(double xpos, double ypos)
+	void MainWindow::MouseEvent(int button, int action, int mod)
 	{
 
 	}

@@ -1,4 +1,4 @@
-#include <vector>
+#include <map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -23,7 +23,7 @@ struct Resources
 	};
 	void Load();
 	bool LoadTextureFromFile(const char* filename, Texture* texture);
-	std::vector<Texture>textures;
+	std::map<std::string, Texture>textures;
 	Logger* logger = nullptr;
 	unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 	unsigned int compileShader(unsigned int type, const char* source);
