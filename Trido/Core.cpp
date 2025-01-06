@@ -15,6 +15,7 @@ namespace Core
 		gl_window = glfwCreateWindow(settings.video_mode->width, settings.video_mode->height, "Trido", NULL, NULL);
 		io.init(gl_window);
 		glfwMakeContextCurrent(gl_window);
+		//glfwSetWindowMonitor(gl_window, primary_monitor, 0, 0, settings.video_mode->width, settings.video_mode->height, settings.video_mode->refreshRate);
 		glewInit();
 		glfwSwapInterval(1);
 

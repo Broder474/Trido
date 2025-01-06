@@ -76,10 +76,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="frag1.glsl">
+    <None Include="shaders\frag1.frag">
       <Filter>shaders</Filter>
     </None>
-    <None Include="vert1.glsl">
+    <None Include="vert1.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

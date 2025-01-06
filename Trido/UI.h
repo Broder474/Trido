@@ -14,9 +14,10 @@ namespace UI
 	public:
 		Window(GLFWwindow* window, Resources* resources);
 		virtual void Render() {};
-		virtual void MouseEvent(int button, int action, int mod) {};
+		virtual void MouseEvent(int button, int action, int mod);
 		virtual void OnKeyClick(int key, int scancode, int action, int mod) {};
 		virtual void Event() {};
+		void RenderGUI();
 
 		enum InputRule { ALLOW_ALL, ALLOW_MOUSE, FORBID_ALL }LockInput = FORBID_ALL;
 
@@ -24,15 +25,26 @@ namespace UI
 		{
 			using CallBack = std::function<void()>;
 		public:
+			using Texture = Resources::Texture;
+			using Shader = Resources::Shader;
 			// mouse button click borders
-			glm::vec2 point1{ 0, 0 };
-			glm::vec2 point2{ 0, 0 };
+			virtual void Render();
 			virtual void MouseEvent(int button, int action, int mod) {};
 
-			GUI_Element(glm::vec2 point1, glm::vec2 point2);
+			GUI_Element(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name);
 
 			// check if point is in borders of gui object
-			virtual bool IsInBounds(glm::vec2);
+			virtual bool IsInBounds(glm::vec2 point);
+		protected:
+			void CacheShader();
+			std::string shader_name;
+			Resources* res = nullptr;
+			glm::vec2 point1{ 0, 0 };
+			glm::vec2 point2{ 0, 0 };
+			glm::mat4 model, projection;
+			bool isVisible = true;
+			bool isActive = true;
+			Shader* cached_shader = nullptr;
 		};
 
 		std::vector<std::shared_ptr<GUI_Element>>gui_elements;
@@ -45,8 +57,30 @@ namespace UI
 	class Color_Button : public Window::GUI_Element
 	{		
 	public:
-		Color_Button(glm::vec2 point1, glm::vec2 point2);
+		Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name);
+		void Render() override;
 		void MouseEvent(int button, int action, int mod) override;
+	};
+
+	class Image_Button : public Window::GUI_Element
+	{
+	public:
+		Image_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, std::string texture_name);
+		void MouseEvent(int button, int action, int mod) override;
+		void Render() override;
+	private:
+		std::string texture_name;
+	};
+
+	class Image : public Window::GUI_Element
+	{
+	public:
+		Image(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, std::string texture_name);
+		void Render() override;
+		void MouseEvent(int button, int action, int mod) override;
+	private:
+		std::string texture_name;
+		Texture* cached_texture = nullptr;
 	};
 
 	class MainWindow : public Window
@@ -57,20 +91,5 @@ namespace UI
 		void MouseEvent(int button, int action, int mod) override;
 		void OnKeyClick(int key, int scancode, int action, int mod) override;
 		void Event() override;
-
-		float vertices[20] = {
-			// позиции       // текстурные координаты
-			 0.5f,  1.f, 0.0f,  1.0f, 1.0f, // верхний правый угол
-			 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, // нижний правый угол
-			-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // нижний левый угол
-			-0.5f,  0.5f, 0.0f,  0.0f, 1.0f  // верхний левый угол
-		};
-
-		unsigned int indices[6] = {
-			0, 1, 3, // первый треугольник
-			1, 2, 3  // второй треугольник
-		};
-		unsigned int shaderProgram;
-		unsigned int VBO, VAO, EBO;
 	};
 }

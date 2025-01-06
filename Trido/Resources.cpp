@@ -16,15 +16,17 @@ unsigned int Resources::compileShader(unsigned int type, const char* source) {
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
+ 	if (!success) {
 		glGetShaderInfoLog(shader, 512, nullptr, infoLog);
 		logger->print(Log_type::LOG_ERROR, infoLog);
 	}
 	return shader;
 }
 
-unsigned int Resources::createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource) {
+unsigned int Resources::CreateShaderProgram(const char* vertexShaderFile, const char* fragmentShaderFile) {
 	// compiling shaders
+	const char* vertexShaderSource = LoadShaderFromFile(vertexShaderFile);
+	const char* fragmentShaderSource = LoadShaderFromFile(fragmentShaderFile);
 	unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
 	unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
@@ -47,21 +49,63 @@ unsigned int Resources::createShaderProgram(const char* vertexShaderSource, cons
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	delete[] vertexShaderSource;
+	delete[] fragmentShaderSource;
+
 	return program;
 }
 void Resources::Load()
 {
 	int textures_count = 1;
-	textures;
 	for (int i = 0; i < textures_count; i++)
 	{
 		// handling xml data
 	}
-	Resources::Texture tex1;
-	if (LoadTextureFromFile("textures/tex1.png", &tex1))
+	Texture* tex1 = nullptr;
+	if (LoadTextureFromFile("textures/tex1.png", tex1))
 		textures.insert({ "tex1", tex1 });
+	unsigned int shaderProgram = CreateShaderProgram("shaders/vert1.vert", "shaders/frag1.frag");
+
+	float vertices[20] = {
+		// позиции       // текстурные координаты
+		 -1.0f,  -1.0f, 0.0f,  0.0f, 0.0f, // верхний правый угол
+		 -1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // нижний правый угол
+		1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // нижний левый угол
+		1.0f,  1.0f, 0.0f,  1.0f, 1.0f  // верхний левый угол
+	};
+
+	unsigned int indices[6] = {
+		0, 1, 2, // первый треугольник
+		1, 2, 3  // второй треугольник
+	};
+	unsigned int VBO, VAO, EBO;
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	// Атрибуты вершин
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Атрибуты текстурных координат
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	shaders.insert({ "shader1", new Shader(shaderProgram, VAO, VBO) });
 }
-bool Resources::LoadTextureFromFile(const char* filename, Texture* texture)
+bool Resources::LoadTextureFromFile(const char* filename, Texture*& texture)
 {
 	// Load from file
 	int image_width = 0;
@@ -88,8 +132,29 @@ bool Resources::LoadTextureFromFile(const char* filename, Texture* texture)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 	stbi_image_free(image_data);
 
+	texture = new Texture();
 	texture->tex_id = image_texture;
 	texture->width = image_width;
 	texture->height = image_height;
 	texture->channels = 4;
+	texture->texelWidth = 1. / image_width;
+	texture->texelHeight = 1. / image_height;
+}
+
+const char* Resources::LoadShaderFromFile(const char* filename)
+{
+	std::ifstream stream(filename);
+	if (!stream.is_open())
+	{
+		std::string error_string = "Shader \"" + std::string(filename) + "\" not found";
+		logger->print(Log_type::LOG_ERROR, error_string);
+	}
+	std::string data = "";
+	std::string temp = "";
+	while (std::getline(stream, temp)) { data += temp + "\n"; };
+	stream.close();
+	char* result = new char[data.size() + 1];
+	std::copy(data.begin(), data.end(), result);
+	result[data.size()] = '\0';
+	return result;
 }
