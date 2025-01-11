@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Resources::Resources(Logger* logger) : logger(logger) 
+Resources::Resources(Logger& logger, IO* io) : logger(logger), io(io)
 {
 	stbi_set_flip_vertically_on_load(true);
 };
@@ -18,7 +18,7 @@ unsigned int Resources::compileShader(unsigned int type, const char* source) {
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
  	if (!success) {
 		glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-		logger->print(Log_type::LOG_ERROR, infoLog);
+		logger.print(Log_type::LOG_ERROR, infoLog);
 	}
 	return shader;
 }
@@ -42,7 +42,7 @@ unsigned int Resources::CreateShaderProgram(const char* vertexShaderFile, const 
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(program, 512, nullptr, infoLog);
-		logger->print(Log_type::LOG_ERROR, infoLog);
+		logger.print(Log_type::LOG_ERROR, infoLog);
 	}
 
 	// delete shaders after linking
@@ -64,46 +64,86 @@ void Resources::Load()
 	Texture* tex1 = nullptr;
 	if (LoadTextureFromFile("textures/tex1.png", tex1))
 		textures.insert({ "tex1", tex1 });
-	unsigned int shaderProgram = CreateShaderProgram("shaders/vert1.vert", "shaders/frag1.frag");
+	else
+		logger.print(Log_type::INFO, std::to_string(GetLastError()));
 
-	float vertices[20] = {
-		// позиции       // текстурные координаты
-		 -1.0f,  -1.0f, 0.0f,  0.0f, 0.0f, // верхний правый угол
-		 -1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // нижний правый угол
-		1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // нижний левый угол
-		1.0f,  1.0f, 0.0f,  1.0f, 1.0f  // верхний левый угол
-	};
+	{
+		unsigned int shaderProgram = CreateShaderProgram("shaders/vert1.vert", "shaders/frag1.frag");
 
-	unsigned int indices[6] = {
-		0, 1, 2, // первый треугольник
-		1, 2, 3  // второй треугольник
-	};
-	unsigned int VBO, VAO, EBO;
+		float vertices[20] = {
+			// positions  // texture coordinates
+			 -1.0f,  -1.0f, 0.0f,  0.0f, 0.0f,  // left down
+			 -1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // left top
+			1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // right down
+			1.0f,  1.0f, 0.0f,  1.0f, 1.0f  // right top
+		};
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+		unsigned int indices[6] = {
+			0, 1, 2,
+			1, 2, 3
+		};
+		unsigned int VBO, VAO, EBO;
 
-	glBindVertexArray(VAO);
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Атрибуты вершин
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// Атрибуты текстурных координат
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+		// Атрибуты вершин
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+		// Атрибуты текстурных координат
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
-	shaders.insert({ "shader1", new Shader(shaderProgram, VAO, VBO) });
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		shaders.insert({ "shader1", new Shader(shaderProgram, VAO, VBO) });
+	}
+
+	{
+		unsigned int shaderProgram = CreateShaderProgram("shaders/vert2.vert", "shaders/frag2.frag");
+
+		float vertices[20] = {
+			// positions  // texture coordinates
+			-1.0f,  -1.0f, 0.0f,  // left down
+			-1.0f, 1.0f, 0.0f, // left top
+			1.0f, -1.0f, 0.0f, // right down
+			1.0f,  1.0f, 0.0f // right top
+		};
+		unsigned int indices[6] = {
+			0, 1, 2,
+			1, 2, 3
+		};
+		unsigned int VBO, VAO, EBO;
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glBindVertexArray(0);
+
+		shaders.insert({ "shader2", new Shader(shaderProgram, VAO, VBO) });
+	}
 }
 bool Resources::LoadTextureFromFile(const char* filename, Texture*& texture)
 {
@@ -147,7 +187,7 @@ const char* Resources::LoadShaderFromFile(const char* filename)
 	if (!stream.is_open())
 	{
 		std::string error_string = "Shader \"" + std::string(filename) + "\" not found";
-		logger->print(Log_type::LOG_ERROR, error_string);
+		logger.print(Log_type::LOG_ERROR, error_string);
 	}
 	std::string data = "";
 	std::string temp = "";

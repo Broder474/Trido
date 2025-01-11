@@ -2,7 +2,7 @@
 
 namespace Core
 {
-	Core::Core(): res(&logger)
+	Core::Core(): res(logger, &io)
 	{
 		glfwInit();
 		glewExperimental = GL_TRUE;

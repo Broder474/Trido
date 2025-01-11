@@ -5,6 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>  
 #include "Logger.h"
+#include "IO.h"
+
+using namespace Input_Output;
 
 class Settings
 {
@@ -16,7 +19,7 @@ public:
 class Resources
 {
 public:
-	Resources(Logger* logger);
+	Resources(Logger& logger, IO* io);
 	struct Texture
 	{
 		int width = 0;
@@ -38,14 +41,8 @@ public:
 	unsigned int compileShader(unsigned int type, const char* source);
 	std::map<std::string, Texture*>textures;
 	std::map<std::string, Shader*>shaders;
-	Logger* logger = nullptr;
+	Logger& logger;
+	IO* io;
 private:
 	const char* LoadShaderFromFile(const char* filename);
-};
-class System
-{
-public:
-	float monitor_scaleX = 0;
-	float monitor_scaleY = 0;
-	const GLFWvidmode* video_mode;
 };

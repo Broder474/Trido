@@ -48,6 +48,9 @@
     <ClCompile Include="Resources.cpp">
       <Filter>Broder</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Broder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IO.h">
@@ -72,6 +75,9 @@
       <Filter>Broder</Filter>
     </ClInclude>
     <ClInclude Include="Resources.h">
+      <Filter>Broder</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
       <Filter>Broder</Filter>
     </ClInclude>
   </ItemGroup>

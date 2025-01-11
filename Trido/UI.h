@@ -1,9 +1,10 @@
 #include <functional>
 #include "Resources.h"
-#include <iostream>
+#include "Utils.h"
 
 // id means z-index in context of windows, higher id is upper
 typedef unsigned int id;
+using namespace Utils;
 
 namespace UI
 {
@@ -57,9 +58,11 @@ namespace UI
 	class Color_Button : public Window::GUI_Element
 	{		
 	public:
-		Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name);
+		Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, rgba rgba);
 		void Render() override;
 		void MouseEvent(int button, int action, int mod) override;
+	private:
+		rgba color;
 	};
 
 	class Image_Button : public Window::GUI_Element

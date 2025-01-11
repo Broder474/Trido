@@ -46,17 +46,41 @@ namespace UI
 
 	}
 
-	Color_Button::Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name): GUI_Element(res, point1, point2, shader_name)
+	Color_Button::Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, rgba color): GUI_Element(res, point1, point2, shader_name), color(color)
 	{
 
 	}
 	void Color_Button::Render()
 	{
+		if (!cached_shader)
+			CacheShader();
 
+		glUseProgram(cached_shader->shaderProgram); 
+
+		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform4fv(glGetUniformLocation(cached_shader->shaderProgram, "color"), 1, color.array);
+		glBindVertexArray(cached_shader->VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 	void Color_Button::MouseEvent(int button, int action, int mod)
 	{
-		
+		if (isActive)
+		{
+			glm::vec2 curs_pos = res->io->GetCursorPos();
+			if (button == GLFW_MOUSE_BUTTON_LEFT)
+			{
+				if (action == GLFW_PRESS)
+				{
+					MessageBoxA(0, "press", 0, 0);
+				}
+				else if (action == GLFW_RELEASE)
+				{
+					MessageBoxA(0, "release", 0, 0);
+				}
+			}
+
+		}
 	}
 
 	Image_Button::Image_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, std::string texture_name) : GUI_Element(res, point1, point2, shader_name), 
@@ -83,13 +107,13 @@ namespace UI
 			cached_texture = res->textures[texture_name];
 		if (!cached_shader)
 			CacheShader();
-		GLuint texelSizeLoc = glGetUniformLocation(cached_shader->shaderProgram, "texelSize");
-		glUniform2f(texelSizeLoc, cached_texture->texelWidth, cached_texture->texelHeight);
 
 		glUseProgram(cached_shader->shaderProgram);
-		// Передаём модельную матрицу
+
 		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		// GLuint texelSizeLoc = glGetUniformLocation(cached_shader->shaderProgram, "texelSize");
+		// glUniform2f(texelSizeLoc, cached_texture->texelWidth, cached_texture->texelHeight);
 		glBindTexture(GL_TEXTURE_2D, cached_texture->tex_id);
 		glBindVertexArray(cached_shader->VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -103,6 +127,7 @@ namespace UI
 	MainWindow::MainWindow(GLFWwindow* window, Resources* resources) : Window(window, resources)
 	{
 		gui_elements.push_back(std::make_shared<Image>(Image(res, { 0.0f, 0.9f }, { 0.1f, 1.0f }, "shader1", "tex1")));
+		gui_elements.push_back(std::make_shared<Color_Button>(Color_Button(res, { 0.45f, 0.45f }, { 0.55f, 0.55f }, "shader2", rgba(.0f, 1, 0, 1.0f))));
 	}
 	void MainWindow::Render() 
 	{
@@ -118,7 +143,7 @@ namespace UI
 	}
 	void MainWindow::MouseEvent(int button, int action, int mod)
 	{
-
+		
 	}
 	void MainWindow::Event()
 	{
