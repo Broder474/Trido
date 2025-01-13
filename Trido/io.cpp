@@ -9,7 +9,6 @@ namespace Input_Output
 	void IO::UpdateCursorPos(double xpos, double ypos)
 	{
 		cursor_pos = { xpos / vid_size.x, 1 - ypos / vid_size.y };
-		std::printf("x, y: %f, %f", cursor_pos.x, cursor_pos.y);
 	}
 	void IO::init(GLFWwindow* window)
 	{

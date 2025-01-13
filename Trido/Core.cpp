@@ -53,9 +53,6 @@ namespace Core
 			std::vector<std::shared_ptr<Window>>& windows = core->windows;
 			for (auto& window : windows)
 			{
-				std::vector<std::shared_ptr<UI::Window::GUI_Element>>& gui_elements = window->gui_elements;
-				for (auto& gui_element : gui_elements)
-					gui_element->MouseEvent(button, action, mod);
 				window->MouseEvent(button, action, mod);
 				if (window->LockInput == Window::ALLOW_ALL || window->LockInput == Window::ALLOW_MOUSE)
 					continue;
@@ -68,6 +65,18 @@ namespace Core
 	{
 		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
 		core->io.UpdateCursorPos(xpos, ypos);
+		if (core) {
+			// first input topper window
+			std::vector<std::shared_ptr<Window>>& windows = core->windows;
+			for (auto& window : windows)
+			{
+				window->CursorPosEvent();
+				if (window->LockInput == Window::ALLOW_ALL || window->LockInput == Window::ALLOW_MOUSE)
+					continue;
+				// stop accept input from lower windows
+				else break;
+			}
+		}
 	}
 	void Core::Loop()
 	{

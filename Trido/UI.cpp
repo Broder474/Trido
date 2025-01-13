@@ -10,9 +10,12 @@ namespace UI
 	void Window::MouseEvent(int button, int action, int mod)
 	{
 		for (auto& gui_element : gui_elements)
-		{
-			
-		}
+			gui_element->MouseEvent(button, action, mod);
+	}
+	void Window::CursorPosEvent()
+	{
+		for (auto& gui_elements : gui_elements)
+			gui_elements->CursorPosEvent();
 	}
 	void Window::RenderGUI()
 	{
@@ -38,8 +41,9 @@ namespace UI
 	void GUI_Element::CacheShader() { cached_shader = res->shaders[shader_name]; }
 	bool GUI_Element::IsInBounds(glm::vec2 point)
 	{
-		// надо проверить какие координаты при клике, чтобы понимать откуда считать координаты, а потом писать логику
-		return true;
+		if (point.x >= point1.x && point.x < point2.x && point.y >= point1.y && point.y <= point2.y)
+			return true;
+		return false;
 	}
 	void GUI_Element::Render()
 	{
@@ -48,7 +52,8 @@ namespace UI
 
 	Color_Button::Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, rgba color): GUI_Element(res, point1, point2, shader_name), color(color)
 	{
-
+		hovered_color = color * 0.8f;
+		pressed_color = color * 0.6f;
 	}
 	void Color_Button::Render()
 	{
@@ -59,27 +64,37 @@ namespace UI
 
 		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		rgba& color = isPressed ? pressed_color : isHovered ? hovered_color : this->color;
 		glUniform4fv(glGetUniformLocation(cached_shader->shaderProgram, "color"), 1, color.array);
 		glBindVertexArray(cached_shader->VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 	void Color_Button::MouseEvent(int button, int action, int mod)
 	{
+		if (!isActive || !IsInBounds(res->io->GetCursorPos()))
+			return;
+		if (button == GLFW_MOUSE_BUTTON_LEFT)
+		{
+			if (action == GLFW_PRESS)
+			{
+				isPressed = true;
+			}
+			else if (action == GLFW_RELEASE)
+			{
+				isPressed = false;
+				MessageBoxA(0, "Release", 0, 0);
+			}
+		}
+	}
+
+	void Color_Button::CursorPosEvent()
+	{
 		if (isActive)
 		{
-			glm::vec2 curs_pos = res->io->GetCursorPos();
-			if (button == GLFW_MOUSE_BUTTON_LEFT)
-			{
-				if (action == GLFW_PRESS)
-				{
-					MessageBoxA(0, "press", 0, 0);
-				}
-				else if (action == GLFW_RELEASE)
-				{
-					MessageBoxA(0, "release", 0, 0);
-				}
-			}
-
+			if (IsInBounds(res->io->GetCursorPos()))
+				isHovered = true;
+			else
+				isHovered = isPressed = false;
 		}
 	}
 
@@ -140,10 +155,6 @@ namespace UI
 	{
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 			glfwSetWindowShouldClose(window, true);
-	}
-	void MainWindow::MouseEvent(int button, int action, int mod)
-	{
-		
 	}
 	void MainWindow::Event()
 	{

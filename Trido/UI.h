@@ -16,6 +16,7 @@ namespace UI
 		Window(GLFWwindow* window, Resources* resources);
 		virtual void Render() {};
 		virtual void MouseEvent(int button, int action, int mod);
+		virtual void CursorPosEvent();
 		virtual void OnKeyClick(int key, int scancode, int action, int mod) {};
 		virtual void Event() {};
 		void RenderGUI();
@@ -31,6 +32,7 @@ namespace UI
 			// mouse button click borders
 			virtual void Render();
 			virtual void MouseEvent(int button, int action, int mod) {};
+			virtual void CursorPosEvent() {};
 
 			GUI_Element(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name);
 
@@ -61,8 +63,12 @@ namespace UI
 		Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, rgba rgba);
 		void Render() override;
 		void MouseEvent(int button, int action, int mod) override;
+		void CursorPosEvent() override;
 	private:
 		rgba color;
+		rgba hovered_color;
+		rgba pressed_color;
+		bool isHovered = false, isPressed = false;
 	};
 
 	class Image_Button : public Window::GUI_Element
@@ -91,7 +97,6 @@ namespace UI
 	public:
 		MainWindow(GLFWwindow* window, Resources* resources);
 		void Render() override;
-		void MouseEvent(int button, int action, int mod) override;
 		void OnKeyClick(int key, int scancode, int action, int mod) override;
 		void Event() override;
 	};

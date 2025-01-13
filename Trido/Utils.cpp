@@ -10,4 +10,9 @@ namespace Utils
 	{
 
 	}
+	rgba::rgba() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {};
+	rgba rgba::operator * (float gain)
+	{
+		return { r * gain, g * gain, b * gain };
+	}
 }
