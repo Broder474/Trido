@@ -44,7 +44,8 @@ namespace UI
 			Resources* res = nullptr;
 			glm::vec2 point1{ 0, 0 };
 			glm::vec2 point2{ 0, 0 };
-			glm::mat4 model, projection;
+			glm::mat4 model;
+			glm::mat4& projection;
 			bool isVisible = true;
 			bool isActive = true;
 			Shader* cached_shader = nullptr;
@@ -54,7 +55,6 @@ namespace UI
 	protected:
 		GLFWwindow* window = nullptr;
 		Resources* res = nullptr;
-		float mouseX = 0.0f, mouseY = 0.0f;
 	};
 
 	class Color_Button : public Window::GUI_Element
@@ -64,11 +64,14 @@ namespace UI
 		void Render() override;
 		void MouseEvent(int button, int action, int mod) override;
 		void CursorPosEvent() override;
+		void SetBorderTop(float size) { border_top = size; }
+		void SetBorderLeft(float size) { border_left = size; }
 	private:
 		rgba color;
 		rgba hovered_color;
 		rgba pressed_color;
 		bool isHovered = false, isPressed = false;
+		float border_top = 0.09f, border_left = 0.05f;
 	};
 
 	class Image_Button : public Window::GUI_Element

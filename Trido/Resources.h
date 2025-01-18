@@ -6,16 +6,10 @@
 #include <glm/gtc/type_ptr.hpp>  
 #include "Logger.h"
 #include "IO.h"
+#include "StateManager.h"
 
 using namespace Input_Output;
 
-class Settings
-{
-public:
-	float monitory_scaleX = 0;
-	float monitory_scaleY = 0;
-	const GLFWvidmode* video_mode;
-};
 class Resources
 {
 public:
@@ -43,6 +37,7 @@ public:
 	std::map<std::string, Shader*>shaders;
 	Logger& logger;
 	IO* io;
+	State::StateManager* sm;
 private:
 	const char* LoadShaderFromFile(const char* filename);
 };

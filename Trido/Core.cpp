@@ -7,34 +7,39 @@ namespace Core
 		glfwInit();
 		glewExperimental = GL_TRUE;
 
-		GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
-		glfwGetMonitorContentScale(primary_monitor, &settings.monitory_scaleX, &settings.monitory_scaleY);
-
-		settings.video_mode = glfwGetVideoMode(primary_monitor);
-
-		gl_window = glfwCreateWindow(settings.video_mode->width, settings.video_mode->height, "Trido", NULL, NULL);
-		io.init(gl_window);
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		gl_window = glfwCreateWindow(mode->width, mode->height, "Trido", nullptr, nullptr);
 		glfwMakeContextCurrent(gl_window);
-		//glfwSetWindowMonitor(gl_window, primary_monitor, 0, 0, settings.video_mode->width, settings.video_mode->height, settings.video_mode->refreshRate);
 		glewInit();
 		glfwSwapInterval(1);
+		res.Load();
+		io.init(gl_window, &res.sm->projection);
 
 		glfwSetWindowUserPointer(gl_window, this);
 		glfwSetKeyCallback(gl_window, Core::KeyCallback);
 		glfwSetMouseButtonCallback(gl_window, Core::MouseCallback);
 		glfwSetCursorPosCallback(gl_window, Core::CursorPosCallback);
+		glfwSetWindowSizeCallback(gl_window, Core::WindowSizeCallback);
 
-		res.Load();
 		windows.push_back(std::make_shared<MainWindow>(gl_window, &res));
 		logger.print(Log_type::INFO, "Core run");
 	}
 	void Core::KeyCallback(GLFWwindow* gl_window, int key, int scancode, int action, int mod)
 	{
 		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(gl_window));
+		// global keybinds
+		// fullscreen toogle
+		if (key == GLFW_KEY_F12 && action == GLFW_RELEASE)
+		{
+			core->io.ToggleFullscreen();
+			return;
+		}
+
+		// general key input
 		if (core) {
 			// first input topper window
 			std::vector<std::shared_ptr<Window>>& windows = core->windows;
- 			for (auto& window : windows)
+			for (auto& window : windows)
 			{
 				window->OnKeyClick(key, scancode, action, mod);
 				if (window->LockInput == Window::ALLOW_ALL)
@@ -77,6 +82,14 @@ namespace Core
 				else break;
 			}
 		}
+	}
+	void Core::WindowSizeCallback(GLFWwindow* window, int width, int height)
+	{
+		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
+
+		glViewport(0, 0, width, height);
+		printf("Framebuffer resized: %d x %d\n", width, height);
+
 	}
 	void Core::Loop()
 	{

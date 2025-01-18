@@ -5,6 +5,7 @@
 Resources::Resources(Logger& logger, IO* io) : logger(logger), io(io)
 {
 	stbi_set_flip_vertically_on_load(true);
+	sm = new State::StateManager();
 };
 
 unsigned int Resources::compileShader(unsigned int type, const char* source) {

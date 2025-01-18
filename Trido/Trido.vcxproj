@@ -113,6 +113,10 @@
       <AdditionalLibraryDirectories>C:\libs\glfw-3.3.8\lib\Debug;C:\Libs\Lua;C:\libs\freeglut-3.6.0\lib\Debug;C:\libs\glew\lib\Release\x64;C:\libs\glm\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>liblua54.a;glfw3.lib;freeglutd.lib;glew32.lib;glew32s.lib;glm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /E /I /H /Y "$(ProjectDir)shaders\*.*" "$(OutDir)shaders\"
+xcopy /E /I /H /Y "$(ProjectDir)textures\*.*" "$(OutDir)textures\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -130,9 +134,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\libs\glfw-3.3.8\lib\Release;C:\Libs\Lua;C:\libs\freeglut-3.6.0\lib\Release;C:\libs\glew\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liblua54.a;glfw3.lib;freeglut.lib;glew32.liba;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\libs\glfw-3.3.8\lib\Release;C:\Libs\Lua;C:\libs\glew\lib\Release\x64;C:\libs\freeglut-3.6.0\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>liblua54.a;glfw3.lib;freeglutd.lib;glew32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /E /I /H /Y "$(ProjectDir)shaders\*.*" "$(OutDir)shaders\"
+xcopy /E /I /H /Y "$(ProjectDir)textures\*.*" "$(OutDir)textures\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />
@@ -152,6 +160,7 @@
     <ClInclude Include="IO.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="CmdManager.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="UI.h" />
@@ -160,6 +169,12 @@
   <ItemGroup>
     <None Include="shaders\frag1.frag" />
     <None Include="vert1.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Trido.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
