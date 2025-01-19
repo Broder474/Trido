@@ -66,7 +66,7 @@ namespace UI
 		rgba borderColor = { baseColor.r * 0.5f, baseColor.g * 0.5f, baseColor.b * 0.5f, baseColor.a };
 
 		// draw border
-		glm::vec3 scale = glm::vec3(1.0f + border_left, 1.0f + border_top, 1.0f); // Масштабируем равномерно
+		glm::vec3 scale = glm::vec3(1.0f + border_left, 1.0f + border_top, 1.0f);
 		glm::mat4 borderModel = glm::scale(model, scale);
 		glUniformMatrix4fv(glGetUniformLocation(cached_shader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(borderModel));
 		glUniform4fv(glGetUniformLocation(cached_shader->shaderProgram, "color"), 1, borderColor.array);
@@ -152,9 +152,9 @@ namespace UI
 	MainWindow::MainWindow(GLFWwindow* window, Resources* resources) : Window(window, resources)
 	{
 		gui_elements.push_back(std::make_shared<Image>(Image(res, { 0.0f, 0.0f }, { 1920.0f, 1080.0f }, "shader1", "tex1")));
-		//Color_Button* btn1 = new Color_Button(res, { 800.0f, 520.0f }, { 900.0f, 560.0f }, "shader2", rgba(.8f, 0.4f, 0.0f, 1.0f));
-		//btn1->SetBorderTop(0.19f);
-		//gui_elements.push_back(std::make_shared<Color_Button>(*btn1));
+		Color_Button* btn1 = new Color_Button(res, { 800.0f, 520.0f }, { 900.0f, 560.0f }, "shader2", rgba(.8f, 0.4f, 0.0f, 1.0f));
+		btn1->SetBorderTop(0.19f);
+		gui_elements.push_back(std::make_shared<Color_Button>(*btn1));
 	}
 	void MainWindow::Render() 
 	{

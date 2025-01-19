@@ -24,6 +24,7 @@ namespace Input_Output
 		glm::vec2 vid_scale{ 0, 0 };
 		bool isFullscreen = false;
 		glm::mat4* projection = nullptr;
+		float vp_offset_x = 0.f, vp_offset_y = 0.f;
 		void ToggleFullscreen();
 	private:
 	};

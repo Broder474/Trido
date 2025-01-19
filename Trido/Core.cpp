@@ -24,10 +24,9 @@ namespace Core
 		windows.push_back(std::make_shared<MainWindow>(gl_window, &res));
 		logger.print(Log_type::INFO, "Core run");
 
-		// force window scale on start
-		int width, height;
-		glfwGetFramebufferSize(gl_window, &width, &height);
-		WindowSizeCallback(gl_window, width, height);
+		// force fake fullscreen on start
+		glfwSetWindowAttrib(gl_window, GLFW_DECORATED, GLFW_FALSE);
+		glfwSetWindowMonitor(gl_window, nullptr, 0, 0, (int)io.vid_size.x, (int)io.vid_size.y, GLFW_DONT_CARE);
 	}
 	void Core::KeyCallback(GLFWwindow* gl_window, int key, int scancode, int action, int mod)
 	{
@@ -101,7 +100,11 @@ namespace Core
 			int viewport_height = static_cast<int>(1080 * scale_ratio);
 			int viewport_x = (width - viewport_width) / 2;
 			int viewport_y = (height - viewport_height) / 2;
+			// save viewport offset for IO
+			core->io.vp_offset_x = viewport_x;
+			core->io.vp_offset_y = viewport_y;
 			glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+			printf("viewport %i, %i, %i, %i", viewport_x, viewport_y, viewport_width, viewport_height);
 		}
 		printf("Framebuffer resized: %d x %d\n", width, height);
 
