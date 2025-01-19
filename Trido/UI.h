@@ -64,14 +64,14 @@ namespace UI
 		void Render() override;
 		void MouseEvent(int button, int action, int mod) override;
 		void CursorPosEvent() override;
-		void SetBorderTop(float size) { border_top = size; }
-		void SetBorderLeft(float size) { border_left = size; }
+		void SetBorderSize(int size) { border_size = size; }
 	private:
 		rgba color;
 		rgba hovered_color;
 		rgba pressed_color;
 		bool isHovered = false, isPressed = false;
-		float border_top = 0.09f, border_left = 0.05f;
+		int border_size = 5;
+		glm::mat4 borderModel;
 	};
 
 	class Image_Button : public Window::GUI_Element

@@ -19,6 +19,7 @@ namespace Input_Output
 		glm::vec2 GetCursorPos() const;
 		glm::vec2 vid_size{ 0, 0 };
 		float scale_ratio = 1.0f;
+		float scale_ratio_width = 1.0f, scale_ratio_height = 1.0f;
 		GLFWwindow* window = nullptr;
 		glm::vec2 cursor_pos{ 0, 0 };
 		glm::vec2 vid_scale{ 0, 0 };

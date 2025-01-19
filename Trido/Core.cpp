@@ -104,9 +104,9 @@ namespace Core
 			core->io.vp_offset_x = viewport_x;
 			core->io.vp_offset_y = viewport_y;
 			glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
-			printf("viewport %i, %i, %i, %i", viewport_x, viewport_y, viewport_width, viewport_height);
+			//printf("viewport %i, %i, %i, %i", viewport_x, viewport_y, viewport_width, viewport_height);
 		}
-		printf("Framebuffer resized: %d x %d\n", width, height);
+		//printf("Framebuffer resized: %d x %d\n", width, height);
 
 	}
 	void Core::Loop()

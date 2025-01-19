@@ -38,6 +38,7 @@ public:
 	Logger& logger;
 	IO* io;
 	State::StateManager* sm;
+	float pixel_width = 1.f / 1920.f, pixel_height = 1.f / 1080.f;
 private:
 	const char* LoadShaderFromFile(const char* filename);
 };

@@ -20,8 +20,8 @@ namespace Input_Output
 		glfwGetMonitorContentScale(primary_monitor, &vid_scale.x, &vid_scale.y);
 		vid_size = { vid_mode->width, vid_mode->height };
 		vid_size /= vid_scale.x;
-		float scale_ratio_width = (float)vid_mode->width / 1920;
-		float scale_ratio_height = (float)vid_mode->height / 1080;
+		scale_ratio_width = (float)vid_mode->width / 1920;
+		scale_ratio_height = (float)vid_mode->height / 1080;
 
 		scale_ratio = std::min(scale_ratio_width, scale_ratio_height);
 	}
@@ -33,8 +33,5 @@ namespace Input_Output
 			glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, (int)vid_size.x, (int)vid_size.y, GLFW_DONT_CARE);
 		else
 			glfwSetWindowMonitor(window, nullptr, 0, 0, (int)vid_size.x, (int)vid_size.y, GLFW_DONT_CARE);
-		// need to check on real smaller monitor
-		// glViewport(0, 0, (int)vid_size.x, (int)vid_size.y);
-		printf("Framebuffer resized: %f x %f\n", vid_size.x, vid_size.y);
 	}
 }
