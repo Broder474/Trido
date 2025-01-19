@@ -9,7 +9,7 @@ namespace Input_Output
 	void IO::UpdateCursorPos(double xpos, double ypos)
 	{
 		cursor_pos = { xpos / scale_ratio, 1080 - ypos / scale_ratio };
-		printf("x: %f% y: %f%\n", cursor_pos.x, cursor_pos.y);
+		printf("x: %f y: %f\n", cursor_pos.x, cursor_pos.y);
 	}
 	void IO::init(GLFWwindow* window, glm::mat4* projection)
 	{
@@ -30,10 +30,10 @@ namespace Input_Output
 	{
 		isFullscreen = !isFullscreen;
 		if (isFullscreen)
-			glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, vid_size.x, vid_size.y, GLFW_DONT_CARE);
+			glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, (int)vid_size.x, (int)vid_size.y, GLFW_DONT_CARE);
 		else
-			glfwSetWindowMonitor(window, nullptr, 0, 0, vid_size.x, vid_size.y, GLFW_DONT_CARE);
-		glViewport(0, 0, vid_size.x, vid_size.y);
+			glfwSetWindowMonitor(window, nullptr, 0, 0, (int)vid_size.x, (int)vid_size.y, GLFW_DONT_CARE);
+		glViewport(0, 0, (int)vid_size.x, (int)vid_size.y);
 		printf("Framebuffer resized: %f x %f\n", vid_size.x, vid_size.y);
 	}
 }

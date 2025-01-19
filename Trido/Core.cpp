@@ -23,6 +23,11 @@ namespace Core
 
 		windows.push_back(std::make_shared<MainWindow>(gl_window, &res));
 		logger.print(Log_type::INFO, "Core run");
+
+		// force window scale on start
+		int width, height;
+		glfwGetFramebufferSize(gl_window, &width, &height);
+		WindowSizeCallback(gl_window, width, height);
 	}
 	void Core::KeyCallback(GLFWwindow* gl_window, int key, int scancode, int action, int mod)
 	{
