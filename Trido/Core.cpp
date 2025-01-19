@@ -87,7 +87,17 @@ namespace Core
 	{
 		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
 
-		glViewport(0, 0, width, height);
+		float scale_ratio = std::min((float)width / 1920, (float)height / 1080);
+		if (scale_ratio == 1)
+			glViewport(0, 0, width, height);
+		else 
+		{
+			int viewport_width = static_cast<int>(1920 * scale_ratio);
+			int viewport_height = static_cast<int>(1080 * scale_ratio);
+			int viewport_x = (width - viewport_width) / 2;
+			int viewport_y = (height - viewport_height) / 2;
+			glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+		}
 		printf("Framebuffer resized: %d x %d\n", width, height);
 
 	}

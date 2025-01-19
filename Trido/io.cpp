@@ -23,10 +23,7 @@ namespace Input_Output
 		float scale_ratio_width = (float)vid_mode->width / 1920;
 		float scale_ratio_height = (float)vid_mode->height / 1080;
 		// надо сюда еще добавить масштабирование если экран больше, но мне впадлу
-		if (scale_ratio_width < scale_ratio)
-			scale_ratio = scale_ratio_width;
-		if (scale_ratio_height < scale_ratio)
-			scale_ratio = scale_ratio_height;
+		scale_ratio = std::min(scale_ratio_width, scale_ratio_height);
 	}
 	glm::vec2 IO::GetCursorPos() const { return cursor_pos; }
 	void IO::ToggleFullscreen()
