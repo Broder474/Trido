@@ -1,78 +1,106 @@
 #include <functional>
 #include "Resources.h"
-#include <iostream>
+#include "Utils.h"
 
 // id means z-index in context of windows, higher id is upper
 typedef unsigned int id;
+using namespace Utils;
 
 namespace UI
 {
 	class Window
 	{
+		// permit to receive input from lower windows
+		// by default upper window will forbid input from lower window, change it to ALLOW_ALL if you need mouse and keyboard input or ALLOW_MOUSE if mouse only
 	public:
 		Window(GLFWwindow* window, Resources* resources);
 		virtual void Render() {};
-		virtual void OnMouseClick(int button, int action, int mod) {};
+		virtual void MouseEvent(int button, int action, int mod);
+		virtual void CursorPosEvent();
 		virtual void OnKeyClick(int key, int scancode, int action, int mod) {};
-		virtual void OnCursorPos(double xpos, double ypos) {};
 		virtual void Event() {};
-		// permit to receive input from lower windows
+		void RenderGUI();
+
 		enum InputRule { ALLOW_ALL, ALLOW_MOUSE, FORBID_ALL }LockInput = FORBID_ALL;
 
+		class GUI_Element
+		{
+			using CallBack = std::function<void()>;
+		public:
+			using Texture = Resources::Texture;
+			using Shader = Resources::Shader;
+			// mouse button click borders
+			virtual void Render();
+			virtual void MouseEvent(int button, int action, int mod) {};
+			virtual void CursorPosEvent() {};
+
+			GUI_Element(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name);
+
+			// check if point is in borders of gui object
+			virtual bool IsInBounds(glm::vec2 point);
+		protected:
+			void CacheShader();
+			std::string shader_name;
+			Resources* res = nullptr;
+			glm::vec2 point1{ 0, 0 };
+			glm::vec2 point2{ 0, 0 };
+			glm::mat4 model;
+			glm::mat4& projection;
+			bool isVisible = true;
+			bool isActive = true;
+			Shader* cached_shader = nullptr;
+		};
+
+		std::vector<std::shared_ptr<GUI_Element>>gui_elements;
 	protected:
 		GLFWwindow* window = nullptr;
 		Resources* res = nullptr;
-		double mouseX, mouseY;
-
 	};
+
+	class Color_Button : public Window::GUI_Element
+	{		
+	public:
+		Color_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, rgba rgba);
+		void Render() override;
+		void MouseEvent(int button, int action, int mod) override;
+		void CursorPosEvent() override;
+		void SetBorderSize(int size) { border_size = size; }
+	private:
+		rgba color;
+		rgba hovered_color;
+		rgba pressed_color;
+		bool isHovered = false, isPressed = false;
+		int border_size = 5;
+		glm::mat4 borderModel;
+	};
+
+	class Image_Button : public Window::GUI_Element
+	{
+	public:
+		Image_Button(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, std::string texture_name);
+		void MouseEvent(int button, int action, int mod) override;
+		void Render() override;
+	private:
+		std::string texture_name;
+	};
+
+	class Image : public Window::GUI_Element
+	{
+	public:
+		Image(Resources* res, glm::vec2 point1, glm::vec2 point2, std::string shader_name, std::string texture_name);
+		void Render() override;
+		void MouseEvent(int button, int action, int mod) override;
+	private:
+		std::string texture_name;
+		Texture* cached_texture = nullptr;
+	};
+
 	class MainWindow : public Window
 	{
 	public:
 		MainWindow(GLFWwindow* window, Resources* resources);
 		void Render() override;
-		void OnMouseClick(int button, int action, int mod) override;
 		void OnKeyClick(int key, int scancode, int action, int mod) override;
-		void OnCursorPos(double xpos, double ypos) override;
 		void Event() override;
-
-		float vertices[20] = {
-			// позиции       // текстурные координаты
-			 0.5f,  0.5f, 0.0f,  1.0f, 1.0f, // верхний правый угол
-			 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, // нижний правый угол
-			-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // нижний левый угол
-			-0.5f,  0.5f, 0.0f,  0.0f, 1.0f  // верхний левый угол
-		};
-
-		unsigned int indices[6] = {
-			0, 1, 3, // первый треугольник
-			1, 2, 3  // второй треугольник
-		};
-		unsigned int shaderProgram;
-		unsigned int VBO, VAO, EBO;
-	};
-	class GUI_Element
-	{
-	public:
-		// ivec set mouse button click borders
-		glm::vec2 point1;
-		glm::vec2 point2;
-
-		// check if point is in borders of gui object
-		virtual bool IsInBounds(glm::vec2);
-		
-		using CallBack = std::function<void()>;
-
-		CallBack OnMouseHover;
-		CallBack LeftMouseButtonPressed;
-		CallBack RightMouseButtonPressed;
-
-		GUI_Element(glm::vec2 point1, glm::vec2 point2);
-
-		template<class Object, class Method>
-		void SetOnMouseHoverCallback(Object* OnMouseHoverObj, Method OnMouseHoverMethod);
-		template<class Object, class Method>
-		void SetLeftMouseButtonPressed(Object* LeftMouseButtonPressedObj, Method LeftMouseButtonMethod);
-		template<class Object, class Method>
-		void SetRightMouseButtonPressed(Object* RightMouseButtonPressedObj, Method RighMouseButtonMethod);
 	};
 }

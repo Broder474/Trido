@@ -2,39 +2,48 @@
 
 namespace Core
 {
-	Core::Core(): res(&logger)
+	Core::Core(): res(logger, &io)
 	{
 		glfwInit();
 		glewExperimental = GL_TRUE;
 
-		GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
-		glfwGetMonitorContentScale(primary_monitor, &sysdata.monitor_scaleX, &sysdata.monitor_scaleY);
-		settings.monitory_scaleX = sysdata.monitor_scaleX;
-		settings.monitory_scaleY = sysdata.monitor_scaleY;
-
-		sysdata.video_mode = glfwGetVideoMode(primary_monitor);
-		settings.video_mode = sysdata.video_mode;
-
-		gl_window = glfwCreateWindow(settings.video_mode->width, settings.video_mode->height, "Trido", NULL, NULL);
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		gl_window = glfwCreateWindow(mode->width, mode->height, "Trido", nullptr, nullptr);
 		glfwMakeContextCurrent(gl_window);
 		glewInit();
 		glfwSwapInterval(1);
+		res.Load();
+		io.init(gl_window, &res.sm->projection);
 
 		glfwSetWindowUserPointer(gl_window, this);
 		glfwSetKeyCallback(gl_window, Core::KeyCallback);
 		glfwSetMouseButtonCallback(gl_window, Core::MouseCallback);
+		glfwSetCursorPosCallback(gl_window, Core::CursorPosCallback);
+		glfwSetWindowSizeCallback(gl_window, Core::WindowSizeCallback);
 
-		res.Load();
 		windows.push_back(std::make_shared<MainWindow>(gl_window, &res));
 		logger.print(Log_type::INFO, "Core run");
+
+		// force fake fullscreen on start
+		glfwSetWindowAttrib(gl_window, GLFW_DECORATED, GLFW_FALSE);
+		glfwSetWindowMonitor(gl_window, nullptr, 0, 0, (int)io.vid_size.x, (int)io.vid_size.y, GLFW_DONT_CARE);
 	}
 	void Core::KeyCallback(GLFWwindow* gl_window, int key, int scancode, int action, int mod)
 	{
 		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(gl_window));
+		// global keybinds
+		// fullscreen toogle
+		if (key == GLFW_KEY_F12 && action == GLFW_RELEASE)
+		{
+			core->io.ToggleFullscreen();
+			return;
+		}
+
+		// general key input
 		if (core) {
 			// first input topper window
 			std::vector<std::shared_ptr<Window>>& windows = core->windows;
- 			for (auto& window : windows)
+			for (auto& window : windows)
 			{
 				window->OnKeyClick(key, scancode, action, mod);
 				if (window->LockInput == Window::ALLOW_ALL)
@@ -53,7 +62,7 @@ namespace Core
 			std::vector<std::shared_ptr<Window>>& windows = core->windows;
 			for (auto& window : windows)
 			{
-				window->OnMouseClick(button, action, mod);
+				window->MouseEvent(button, action, mod);
 				if (window->LockInput == Window::ALLOW_ALL || window->LockInput == Window::ALLOW_MOUSE)
 					continue;
 				// stop accept input from lower windows
@@ -63,6 +72,41 @@ namespace Core
 	}
 	void Core::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 	{
+		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
+		core->io.UpdateCursorPos(xpos, ypos);
+		if (core) {
+			// first input topper window
+			std::vector<std::shared_ptr<Window>>& windows = core->windows;
+			for (auto& window : windows)
+			{
+				window->CursorPosEvent();
+				if (window->LockInput == Window::ALLOW_ALL || window->LockInput == Window::ALLOW_MOUSE)
+					continue;
+				// stop accept input from lower windows
+				else break;
+			}
+		}
+	}
+	void Core::WindowSizeCallback(GLFWwindow* window, int width, int height)
+	{
+		Core* core = static_cast<Core*>(glfwGetWindowUserPointer(window));
+
+		float scale_ratio = std::min((float)width / 1920, (float)height / 1080);
+		if (scale_ratio == 1)
+			glViewport(0, 0, width, height);
+		else 
+		{
+			int viewport_width = static_cast<int>(1920 * scale_ratio);
+			int viewport_height = static_cast<int>(1080 * scale_ratio);
+			int viewport_x = (width - viewport_width) / 2;
+			int viewport_y = (height - viewport_height) / 2;
+			// save viewport offset for IO
+			core->io.vp_offset_x = viewport_x;
+			core->io.vp_offset_y = viewport_y;
+			glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+			//printf("viewport %i, %i, %i, %i", viewport_x, viewport_y, viewport_width, viewport_height);
+		}
+		//printf("Framebuffer resized: %d x %d\n", width, height);
 
 	}
 	void Core::Loop()
